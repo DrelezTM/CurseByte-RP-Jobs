@@ -16,6 +16,6 @@ public class JobsService {
     }
 
     public static boolean isUnemployed(UUID uuid) {
-        return getJob(uuid) != "UNEMPLOYMENT";
+        return getJob(uuid) == "UNEMPLOYMENT";
     }
 }
