@@ -3,4 +3,5 @@ org\cursebyte\command\JobsCommand.class
 org\cursebyte\module\jobs\JobsRepository.class
 org\cursebyte\module\jobs\JobsService.class
 org\cursebyte\listener\JobsListener.class
+org\cursebyte\ui\jobs\FishingJobsMenu.class
 org\cursebyte\ui\JobsMenu.class

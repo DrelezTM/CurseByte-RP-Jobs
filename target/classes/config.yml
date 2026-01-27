@@ -9,7 +9,7 @@ jobs:
       NAUTILUS_SHELL: 500.0
 
   farmer:
-    display-name: "🧑‍🌾 Petani"
+    display-name: "🌱 Petani"
     prices:
       WHEAT: 1.0
       WHEAT_SEEDS: 1.0

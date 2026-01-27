@@ -18,7 +18,10 @@ import com.cursebyte.plugin.ui.core.MenuSession;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
+import org.cursebyte.module.jobs.JobsService;
+
 import java.util.List;
+import java.util.UUID;
 
 public class JobsMenu implements Menu {
     @Override
@@ -42,7 +45,7 @@ public class JobsMenu implements Menu {
             inv.setItem(i, blackGlass);
 
         inv.setItem(40, closeItem());
-        inv.setItem(10, fishingJobs());
+        inv.setItem(10, fishermanJobs());
         inv.setItem(11, farmerJobs());
 
         return inv;
@@ -50,7 +53,31 @@ public class JobsMenu implements Menu {
 
     @Override
     public void onClick(Player p, int slot, MenuContext ctx) {
-        if (slot == 40) {
+        UUID targetId = p.getUniqueId();
+        if (slot == 10) {
+            String checkJob = JobsService.getJob(targetId);
+            if (JobsService.isUnemployed(targetId)) {
+                p.sendMessage("§cKamu sudah memiliki pekerjaan");
+                return;
+            }
+
+            JobsService.changeJob(targetId, "FISHERMAN");
+            p.sendMessage("§aPekerjaan kamu sekarang adalah Nelayan");
+
+            p.closeInventory();
+            MenuSession.clear(p);
+        } else if (slot == 11) {
+            if (JobsService.isUnemployed(targetId)) {
+                p.sendMessage("§cKamu sudah memiliki pekerjaan");
+                return;
+            }
+
+            JobsService.changeJob(targetId, "FARMER");
+            p.sendMessage("§aPekerjaan kamu sekarang adalah Petani");
+
+            p.closeInventory();
+            MenuSession.clear(p);
+        } else if (slot == 40) {
             p.closeInventory();
             MenuSession.clear(p);
         }
@@ -82,7 +109,7 @@ public class JobsMenu implements Menu {
         return item;
     }
 
-    private static ItemStack fishingJobs() {
+    private static ItemStack fishermanJobs() {
         ItemStack item = new ItemStack(Material.FISHING_ROD);
         ItemMeta meta = item.getItemMeta();
 

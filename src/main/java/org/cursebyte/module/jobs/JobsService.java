@@ -14,4 +14,8 @@ public class JobsService {
     public static void changeJob(UUID uuid, String job) {
         JobsRepository.changeJob(uuid, job);
     }
+
+    public static boolean isUnemployed(UUID uuid) {
+        return getJob(uuid) != "UNEMPLOYMENT";
+    }
 }
