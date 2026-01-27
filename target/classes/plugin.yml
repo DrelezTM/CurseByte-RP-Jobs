@@ -1,0 +1,13 @@
+name: CursebyteJobs
+version: '1.0'
+main: org.cursebyte.CursebyteJobs
+api-version: '1.21'
+authors: [ DrelezTM ]
+description: Plugin Jobs untuk RolePlay di server minecraft Cursebyte
+website: https://www.cursebyte.my.id
+depend: [ CursebyteCore ]
+
+commands:
+  jobs:
+    description: Membuka Jobs GUI
+    usage: /jobs
