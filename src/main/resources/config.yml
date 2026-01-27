@@ -1,0 +1,21 @@
+jobs:
+  fisherman:
+    display-name: "🐟 Nelayan"
+    prices:
+      COD: 5.0
+      SALMON: 8.0
+      TROPICAL_FISH: 25.0
+      PUFFERFISH: 50.0
+      NAUTILUS_SHELL: 500.0
+
+  farmer:
+    display-name: "🌱 Petani"
+    prices:
+      WHEAT: 1.0
+      WHEAT_SEEDS: 1.0
+      POTATO: 2.0
+      CARROT: 2.0
+      SUGAR_CANE: 3.0
+      MELON_SLICE: 5.0
+      PUMPKIN: 5.0
+      NETHER_WART: 15.0

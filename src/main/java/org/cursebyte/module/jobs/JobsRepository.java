@@ -1,6 +1,6 @@
 package org.cursebyte.module.jobs;
 
-import org.cursebyte.database.DatabaseManager;
+import com.cursebyte.plugin.database.DatabaseManager;
 
 import java.sql.*;
 import java.util.UUID;

@@ -1,6 +1,5 @@
 org\cursebyte\CursebyteJobs.class
 org\cursebyte\command\JobsCommand.class
-org\cursebyte\database\DatabaseManager.class
 org\cursebyte\module\jobs\JobsRepository.class
 org\cursebyte\module\jobs\JobsService.class
 org\cursebyte\listener\JobsListener.class

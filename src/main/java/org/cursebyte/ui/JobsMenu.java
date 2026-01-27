@@ -7,6 +7,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cursebyte.plugin.ui.core.Menu;
 import com.cursebyte.plugin.ui.core.MenuContext;
@@ -53,6 +56,22 @@ public class JobsMenu implements Menu {
         }
     }
 
+    private static FileConfiguration config() {
+        return JavaPlugin.getProvidingPlugin(JobsMenu.class).getConfig();
+    }
+
+    private static String formatMaterial(String material) {
+        String[] parts = material.toLowerCase().split("_");
+        StringBuilder builder = new StringBuilder();
+
+        for (String part : parts) {
+            if (part.isEmpty()) continue;
+            builder.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1)).append(" ");
+        }
+
+        return builder.toString().trim();
+    }
+
     private static ItemStack glass(Material color) {
         ItemStack item = new ItemStack(color);
         ItemMeta meta = item.getItemMeta();
@@ -67,33 +86,35 @@ public class JobsMenu implements Menu {
         ItemStack item = new ItemStack(Material.FISHING_ROD);
         ItemMeta meta = item.getItemMeta();
 
+        ConfigurationSection section = config().getConfigurationSection("jobs.fisherman");
+
         meta.displayName(
-                Component.text("🐟 Nelayan")
+                Component.text(section.getString("display-name", "Nelayan"))
                         .color(TextColor.color(0, 130, 255))
                         .decorate(TextDecoration.BOLD));
 
-        meta.lore(List.of(
-                Component.text(""),
+        List<Component> lore = new java.util.ArrayList<>();
 
-                Component.text("List Harga:")
-                        .color(TextColor.color(180, 180, 180))
-                        .decorate(TextDecoration.ITALIC),
+        lore.add(Component.text(""));
+        lore.add(Component.text("List Harga:")
+                .color(TextColor.color(180, 180, 180))
+                .decorate(TextDecoration.ITALIC));
 
-                Component.text("• Raw Cod $5").color(TextColor.color(120, 255, 120)),
-                Component.text("• Raw Salmon $8").color(TextColor.color(120, 255, 120)),
-                Component.text("• Tropical Fish $25").color(TextColor.color(120, 255, 120)),
-                Component.text("• Pufferfish $50").color(TextColor.color(120, 255, 120)),
-                Component.text("• Nautilus Shell $500").color(TextColor.color(120, 255, 120)),
+        ConfigurationSection prices = section.getConfigurationSection("prices");
+        for (String key : prices.getKeys(false)) {
+            double price = prices.getDouble(key);
+            lore.add(
+                    Component.text("• " + formatMaterial(key) + " $" + price)
+                            .color(TextColor.color(120, 255, 120))
+            );
+        }
 
-                Component.text(""),
+        lore.add(Component.text(""));
+        lore.add(Component.text("Klik untuk membuka")
+                .color(TextColor.color(255, 255, 255))
+                .decorate(TextDecoration.BOLD));
 
-                Component.text("Klik untuk membuka")
-                        .color(TextColor.color(255, 255, 255))
-                        .decorate(TextDecoration.BOLD)
-
-
-        ));
-
+        meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }
@@ -102,33 +123,35 @@ public class JobsMenu implements Menu {
         ItemStack item = new ItemStack(Material.WHEAT);
         ItemMeta meta = item.getItemMeta();
 
+        ConfigurationSection section = config().getConfigurationSection("jobs.farmer");
+
         meta.displayName(
-                Component.text("🧑‍🌾 Petani")
+                Component.text(section.getString("display-name", "Petani"))
                         .color(TextColor.color(0, 130, 255))
                         .decorate(TextDecoration.BOLD));
 
-        meta.lore(List.of(
-                Component.text(""),
+        List<Component> lore = new java.util.ArrayList<>();
 
-                Component.text("List Harga:")
-                        .color(TextColor.color(180, 180, 180))
-                        .decorate(TextDecoration.ITALIC),
+        lore.add(Component.text(""));
+        lore.add(Component.text("List Harga:")
+                .color(TextColor.color(180, 180, 180))
+                .decorate(TextDecoration.ITALIC));
 
-                Component.text("• Wheat / Seeds $1").color(TextColor.color(120, 255, 120)),
-                Component.text("• Potato / Carrot $2").color(TextColor.color(120, 255, 120)),
-                Component.text("• Sugar Cane $3").color(TextColor.color(120, 255, 120)),
-                Component.text("• Melon / Pumpkin $5").color(TextColor.color(120, 255, 120)),
-                Component.text("• Nether Wart $15").color(TextColor.color(120, 255, 120)),
+        ConfigurationSection prices = section.getConfigurationSection("prices");
+        for (String key : prices.getKeys(false)) {
+            double price = prices.getDouble(key);
+            lore.add(
+                    Component.text("• " + formatMaterial(key) + " $" + price)
+                            .color(TextColor.color(120, 255, 120))
+            );
+        }
 
-                Component.text(""),
+        lore.add(Component.text(""));
+        lore.add(Component.text("Klik untuk membuka")
+                .color(TextColor.color(255, 255, 255))
+                .decorate(TextDecoration.BOLD));
 
-                Component.text("Klik untuk membuka")
-                        .color(TextColor.color(255, 255, 255))
-                        .decorate(TextDecoration.BOLD)
-
-
-        ));
-
+        meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }

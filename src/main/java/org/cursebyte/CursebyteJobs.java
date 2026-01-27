@@ -3,7 +3,6 @@ package org.cursebyte;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import org.cursebyte.command.JobsCommand;
-import org.cursebyte.database.DatabaseManager;
 import org.cursebyte.listener.JobsListener;
 import org.cursebyte.module.jobs.JobsRepository;
 import org.cursebyte.ui.JobsMenu;
@@ -14,11 +13,7 @@ public final class CursebyteJobs extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        if (!getDataFolder().exists()) {
-            getDataFolder().mkdirs();
-        }
-
-        DatabaseManager.init(getDataFolder().getAbsolutePath());
+        saveDefaultConfig();
 
         JobsRepository.init();
 
@@ -33,8 +28,6 @@ public final class CursebyteJobs extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        DatabaseManager.close();
-
         getLogger().info("Cursebyte Jobs stopped!");
     }
 
