@@ -8,6 +8,7 @@ import org.cursebyte.module.jobs.JobsRepository;
 import org.cursebyte.ui.JobsMenu;
 
 import com.cursebyte.plugin.ui.core.MenuRegistry;
+import org.cursebyte.ui.SellItemMenu;
 
 public final class CursebyteJobs extends JavaPlugin {
     @Override
@@ -41,5 +42,6 @@ public final class CursebyteJobs extends JavaPlugin {
 
     private void registerMenus() {
         MenuRegistry.register(new JobsMenu());
+        MenuRegistry.register(new SellItemMenu());
     }
 }

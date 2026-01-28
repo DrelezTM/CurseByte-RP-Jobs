@@ -7,7 +7,6 @@ jobs:
       TROPICAL_FISH: 25.0
       PUFFERFISH: 50.0
       NAUTILUS_SHELL: 500.0
-
   farmer:
     display-name: "🌱 Petani"
     prices:
@@ -19,3 +18,7 @@ jobs:
       MELON_SLICE: 5.0
       PUMPKIN: 5.0
       NETHER_WART: 15.0
+
+leave:
+  price: 1000.0
+  cooldown-seconds: 0

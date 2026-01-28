@@ -1,16 +1,16 @@
 package org.cursebyte.ui;
 
+import com.cursebyte.plugin.modules.economy.EconomyService;
 import com.cursebyte.plugin.ui.core.MenuRouter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import com.cursebyte.plugin.ui.core.Menu;
 import com.cursebyte.plugin.ui.core.MenuContext;
@@ -19,20 +19,21 @@ import com.cursebyte.plugin.ui.core.MenuSession;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import org.cursebyte.module.jobs.JobsService;
 
 import java.util.List;
 import java.util.UUID;
 
-public class JobsMenu implements Menu {
+public class SellItemMenu implements Menu {
     @Override
     public String id() {
-        return "jobs";
+        return "sell";
     }
 
     @Override
     public Inventory build(Player p, MenuContext ctx) {
-        Inventory inv = Bukkit.createInventory(null, 45, Component.text("APLIKASI PEKERJAAN"));
+        Inventory inv = Bukkit.createInventory(null, 45, Component.text("JUAL BARANG"));
 
         ItemStack grayGlass = glass(Material.GRAY_STAINED_GLASS_PANE);
         ItemStack blackGlass = glass(Material.BLACK_STAINED_GLASS_PANE);
@@ -46,8 +47,9 @@ public class JobsMenu implements Menu {
             inv.setItem(i, blackGlass);
 
         inv.setItem(40, closeItem());
-        inv.setItem(10, fishermanJobs());
-        inv.setItem(11, farmerJobs());
+        inv.setItem(4, sellInfoItem(p.getUniqueId()));
+        inv.setItem(37, outOfJobs());
+        inv.setItem(43, sellItem());
 
         return inv;
     }
@@ -55,26 +57,31 @@ public class JobsMenu implements Menu {
     @Override
     public void onClick(Player p, int slot, MenuContext ctx) {
         UUID targetId = p.getUniqueId();
-        if (slot == 10) {
-            if (!JobsService.isUnemployed(targetId)) {
-                p.sendMessage("§cKamu sudah memiliki pekerjaan");
+        if (slot == 37) {
+            if (JobsService.isUnemployed(targetId)) {
+                p.sendMessage("§cKamu belum memiliki pekerjaan");
                 return;
             }
 
-            JobsService.changeJob(targetId, "FISHERMAN");
-            p.sendMessage("§aPekerjaan kamu sekarang adalah Nelayan");
+            double price = config().getDouble("leave.price");
+            long cooldown = config().getLong("leave.cooldown-seconds");
 
-            MenuRouter.open(p, "sell");
-        } else if (slot == 11) {
-            if (!JobsService.isUnemployed(targetId)) {
-                p.sendMessage("§cKamu sudah memiliki pekerjaan");
+            if (!JobsService.canLeaveJob(targetId, cooldown)) {
+                long sisa = JobsService.getLeaveCooldownLeft(targetId, cooldown);
+                p.sendMessage("§cKamu bisa keluar job lagi dalam §e" + sisa + " detik.");
                 return;
             }
 
-            JobsService.changeJob(targetId, "FARMER");
-            p.sendMessage("§aPekerjaan kamu sekarang adalah Petani");
+            if (!EconomyService.hasEnough(targetId, price)) {
+                p.sendMessage("§cUang kamu tidak cukup. Biaya: $" + price);
+                return;
+            }
 
-            MenuRouter.open(p, "sell");
+            EconomyService.remove(targetId, price);
+            JobsService.leaveJob(targetId);
+            p.sendMessage("§aKamu berhasil keluar dari pekerjaanmu!");
+
+            MenuRouter.open(p, "jobs");
         } else if (slot == 40) {
             p.closeInventory();
             MenuSession.clear(p);
@@ -107,80 +114,6 @@ public class JobsMenu implements Menu {
         return item;
     }
 
-    private static ItemStack fishermanJobs() {
-        ItemStack item = new ItemStack(Material.FISHING_ROD);
-        ItemMeta meta = item.getItemMeta();
-
-        ConfigurationSection section = config().getConfigurationSection("jobs.fisherman");
-
-        meta.displayName(
-                Component.text(section.getString("display-name", "Nelayan"))
-                        .color(TextColor.color(0, 130, 255))
-                        .decorate(TextDecoration.BOLD));
-
-        List<Component> lore = new java.util.ArrayList<>();
-
-        lore.add(Component.text(""));
-        lore.add(Component.text("List Harga:")
-                .color(TextColor.color(180, 180, 180))
-                .decorate(TextDecoration.ITALIC));
-
-        ConfigurationSection prices = section.getConfigurationSection("prices");
-        for (String key : prices.getKeys(false)) {
-            double price = prices.getDouble(key);
-            lore.add(
-                    Component.text("• " + formatMaterial(key) + " $" + price)
-                            .color(TextColor.color(120, 255, 120))
-            );
-        }
-
-        lore.add(Component.text(""));
-        lore.add(Component.text("Klik untuk membuka")
-                .color(TextColor.color(255, 255, 255))
-                .decorate(TextDecoration.BOLD));
-
-        meta.lore(lore);
-        item.setItemMeta(meta);
-        return item;
-    }
-
-    private static ItemStack farmerJobs() {
-        ItemStack item = new ItemStack(Material.WHEAT);
-        ItemMeta meta = item.getItemMeta();
-
-        ConfigurationSection section = config().getConfigurationSection("jobs.farmer");
-
-        meta.displayName(
-                Component.text(section.getString("display-name", "Petani"))
-                        .color(TextColor.color(0, 130, 255))
-                        .decorate(TextDecoration.BOLD));
-
-        List<Component> lore = new java.util.ArrayList<>();
-
-        lore.add(Component.text(""));
-        lore.add(Component.text("List Harga:")
-                .color(TextColor.color(180, 180, 180))
-                .decorate(TextDecoration.ITALIC));
-
-        ConfigurationSection prices = section.getConfigurationSection("prices");
-        for (String key : prices.getKeys(false)) {
-            double price = prices.getDouble(key);
-            lore.add(
-                    Component.text("• " + formatMaterial(key) + " $" + price)
-                            .color(TextColor.color(120, 255, 120))
-            );
-        }
-
-        lore.add(Component.text(""));
-        lore.add(Component.text("Klik untuk membuka")
-                .color(TextColor.color(255, 255, 255))
-                .decorate(TextDecoration.BOLD));
-
-        meta.lore(lore);
-        item.setItemMeta(meta);
-        return item;
-    }
-
     private static ItemStack closeItem() {
         ItemStack item = new ItemStack(Material.BARRIER);
         ItemMeta meta = item.getItemMeta();
@@ -192,6 +125,80 @@ public class JobsMenu implements Menu {
 
         meta.lore(List.of(
                 Component.text("Keluar dari aplikasi")
+                        .color(TextColor.color(180, 180, 180))
+                        .decorate(TextDecoration.ITALIC)));
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private static ItemStack sellInfoItem(UUID uuid) {
+        ItemStack item = new ItemStack(Material.CLOCK);
+        ItemMeta meta = item.getItemMeta();
+
+        String playerJob = JobsService.getJob(uuid);
+        ConfigurationSection section = config().getConfigurationSection("jobs." + playerJob.toLowerCase());
+
+        meta.displayName(
+                Component.text(section.getString("display-name", "Nama Jobs"))
+                        .color(TextColor.color(0, 130, 255))
+                        .decorate(TextDecoration.BOLD));
+
+        List<Component> lore = new java.util.ArrayList<>();
+
+        lore.add(Component.text(""));
+        lore.add(Component.text("List Harga:")
+                .color(TextColor.color(180, 180, 180))
+                .decorate(TextDecoration.ITALIC));
+
+        ConfigurationSection prices = section.getConfigurationSection("prices");
+        for (String key : prices.getKeys(false)) {
+            double price = prices.getDouble(key);
+            lore.add(
+                    Component.text("• " + formatMaterial(key) + " $" + price)
+                            .color(TextColor.color(120, 255, 120))
+            );
+        }
+
+        meta.lore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private static ItemStack outOfJobs() {
+        ItemStack item = new ItemStack(Material.DARK_OAK_DOOR);
+        ItemMeta meta = item.getItemMeta();
+
+        ConfigurationSection section = config().getConfigurationSection("");
+
+        meta.displayName(
+                Component.text("✖ Keluar Pekerjaan")
+                        .color(TextColor.color(255, 80, 80))
+                        .decorate(TextDecoration.BOLD));
+
+        meta.lore(List.of(
+                Component.text("Keluar dari pekerjaanmu sekarang")
+                        .color(TextColor.color(180, 180, 180))
+                        .decorate(TextDecoration.ITALIC),
+                Component.text("Biaya Keluar Pekerjaan: $" + section.getDouble("leave.price", 0.0))
+                        .color(TextColor.color(255, 242, 0))
+                        .decorate(TextDecoration.ITALIC)));
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private static ItemStack sellItem() {
+        ItemStack item = new ItemStack(Material.EMERALD);
+        ItemMeta meta = item.getItemMeta();
+
+        meta.displayName(
+                Component.text("✔ Jual Barang")
+                        .color(TextColor.color(0, 255, 42))
+                        .decorate(TextDecoration.BOLD));
+
+        meta.lore(List.of(
+                Component.text("Operasi ini tidak bisa dibatalkan")
                         .color(TextColor.color(180, 180, 180))
                         .decorate(TextDecoration.ITALIC)));
 

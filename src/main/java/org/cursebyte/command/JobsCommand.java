@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.cursebyte.plugin.ui.core.MenuRouter;
+import org.cursebyte.module.jobs.JobsService;
 
 public class JobsCommand implements CommandExecutor {
     @Override
@@ -15,7 +16,11 @@ public class JobsCommand implements CommandExecutor {
             return true;
         }
 
-        MenuRouter.open(player, "jobs");
+        if (JobsService.isUnemployed(player.getUniqueId())) {
+            MenuRouter.open(player, "jobs");
+        } else {
+            MenuRouter.open(player, "sell");
+        }
         return true;
     }
 }
