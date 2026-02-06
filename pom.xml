@@ -71,7 +71,7 @@
         <dependency>
             <groupId>com.github.fzrilsh</groupId>
             <artifactId>cursebyte-rp-core</artifactId>
-            <version>v1.0.1</version>
+            <version>v1.4.8</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

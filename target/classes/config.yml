@@ -11,13 +11,81 @@ jobs:
     display-name: "🌱 Petani"
     prices:
       WHEAT: 1.0
-      WHEAT_SEEDS: 1.0
       POTATO: 2.0
       CARROT: 2.0
       SUGAR_CANE: 3.0
       MELON_SLICE: 5.0
       PUMPKIN: 5.0
       NETHER_WART: 15.0
+  miner:
+    display-name: "⛏ Penambang"
+    prices:
+      COBBLESTONE: 0.5
+      COAL: 5.0
+      RAW_IRON: 10.0
+      RAW_COPPER: 6.0
+      RAW_GOLD: 20.0
+      REDSTONE: 8.0
+      LAPIS_LAZULI: 10.0
+      DIAMOND: 100.0
+      EMERALD: 150.0
+      ANCIENT_DEBRIS: 1000.0
+  lumberjack:
+    display-name: "🪓 Penebang Kayu"
+    prices:
+      OAK_LOG: 2.0
+      SPRUCE_LOG: 2.0
+      BIRCH_LOG: 2.0
+      JUNGLE_LOG: 2.0
+      ACACIA_LOG: 2.0
+      DARK_OAK_LOG: 2.0
+      MANGROVE_LOG: 2.0
+      CHERRY_LOG: 2.0
+      PALE_OAK_LOG: 2.0
+  hunter:
+    display-name: "🏹 Pemburu"
+    prices:
+      ROTTEN_FLESH: 0.1
+      BONE: 5.0
+      STRING: 6.0
+      SPIDER_EYE: 6.0
+      GUNPOWDER: 10.0
+      ENDER_PEARL: 50.0
+      BLAZE_ROD: 80.0
+      WITHER_SKELETON_SKULL: 5000.0
+  smelter:
+    display-name: "🔥 Smelter"
+    prices:
+      IRON_INGOT: 15.0
+      COPPER_INGOT: 8.0
+      GOLD_INGOT: 30.0
+      NETHERITE_SCRAP: 600.0
+      GLASS: 2.0
+      SMOOTH_STONE: 1.0
+  breeder:
+    display-name: "🐄 Peternak"
+    prices:
+      BEEF: 6.0
+      PORKCHOP: 6.0
+      MUTTON: 6.0
+      CHICKEN: 5.0
+      RABBIT: 8.0
+      MILK_BUCKET: 15.0
+      EGG: 3.0
+      LEATHER: 10.0
+      FEATHER: 4.0
+  cook:
+    display-name: "🍳 Pemasak"
+    prices:
+      BREAD: 5.0
+      BAKED_POTATO: 5.0
+      COOKED_BEEF: 10.0
+      COOKED_PORKCHOP: 10.0
+      COOKED_CHICKEN: 8.0
+      COOKED_MUTTON: 9.0
+      COOKED_RABBIT: 12.0
+      PUMPKIN_PIE: 20.0
+      CAKE: 50.0
 
 leave:
   price: 1000.0

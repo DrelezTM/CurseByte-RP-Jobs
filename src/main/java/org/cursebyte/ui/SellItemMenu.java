@@ -1,8 +1,5 @@
 package org.cursebyte.ui;
 
-import com.cursebyte.plugin.modules.economy.EconomyService;
-import com.cursebyte.plugin.ui.core.MenuRouter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -15,17 +12,23 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.cursebyte.plugin.ui.core.Menu;
 import com.cursebyte.plugin.ui.core.MenuContext;
 import com.cursebyte.plugin.ui.core.MenuSession;
+import com.cursebyte.plugin.modules.economy.EconomyService;
+import com.cursebyte.plugin.modules.government.stock.GovernmentStockService;
+import com.cursebyte.plugin.ui.core.MenuRouter;
 
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.Component;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import org.cursebyte.module.jobs.JobsService;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class SellItemMenu implements Menu {
+
     @Override
     public String id() {
         return "sell";
@@ -49,8 +52,9 @@ public class SellItemMenu implements Menu {
         inv.setItem(40, closeItem());
         inv.setItem(4, sellInfoItem(p.getUniqueId()));
         inv.setItem(37, outOfJobs());
-        inv.setItem(43, sellItem());
+        inv.setItem(43, sellItem(0));
 
+        ctx.set("inputSlots", Set.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34));
         return inv;
     }
 
@@ -58,6 +62,19 @@ public class SellItemMenu implements Menu {
     public void onClick(Player p, int slot, MenuContext ctx) {
         UUID targetId = p.getUniqueId();
         if (slot == 37) {
+            @SuppressWarnings("unchecked")
+            Set<Integer> inputSlots = (Set<Integer>) ctx.get("inputSlots", Set.class);
+            Inventory inv = p.getOpenInventory().getTopInventory();
+            for (int getSlot : inputSlots) {
+                ItemStack item = inv.getItem(getSlot);
+
+                if (item == null || item.getType() == Material.AIR) continue;
+                inv.setItem(getSlot, null);
+
+                var leftover = p.getInventory().addItem(item);
+                leftover.values().forEach(left -> p.getWorld().dropItemNaturally(p.getLocation(), left));
+            }
+
             if (JobsService.isUnemployed(targetId)) {
                 p.sendMessage("§cKamu belum memiliki pekerjaan");
                 return;
@@ -83,10 +100,108 @@ public class SellItemMenu implements Menu {
 
             MenuRouter.open(p, "jobs");
         } else if (slot == 40) {
+            @SuppressWarnings("unchecked")
+            Set<Integer> inputSlots = (Set<Integer>) ctx.get("inputSlots", Set.class);
+            Inventory inv = p.getOpenInventory().getTopInventory();
+            for (int getSlot : inputSlots) {
+                ItemStack item = inv.getItem(getSlot);
+
+                if (item == null || item.getType() == Material.AIR) continue;
+                inv.setItem(getSlot, null);
+
+                var leftover = p.getInventory().addItem(item);
+                leftover.values().forEach(left -> p.getWorld().dropItemNaturally(p.getLocation(), left));
+            }
+
             p.closeInventory();
             MenuSession.clear(p);
+        } else if (slot == 43) {
+            @SuppressWarnings("unchecked")
+            Set<Integer> inputSlots = (Set<Integer>) ctx.get("inputSlots", Set.class);
+            Inventory inv = p.getOpenInventory().getTopInventory();
+
+            UUID uuid = p.getUniqueId();
+            String job = JobsService.getJob(uuid).toLowerCase();
+
+            ConfigurationSection prices = config().getConfigurationSection("jobs." + job + ".prices");
+
+            if (prices == null) {
+                p.sendMessage("§cPekerjaan kamu tidak bisa menjual barang apapun.");
+                return;
+            }
+
+            double total = 0;
+            boolean hasInvalidItem = false;
+
+            for (int getSlot : inputSlots) {
+                ItemStack item = inv.getItem(getSlot);
+                if (item == null || item.getType() == Material.AIR) continue;
+
+                String materialKey = item.getType().name();
+
+                if (!prices.contains(materialKey)) {
+                    hasInvalidItem = true;
+
+                    inv.setItem(getSlot, null);
+                    var leftover = p.getInventory().addItem(item);
+                    leftover.values().forEach(left -> p.getWorld().dropItemNaturally(p.getLocation(), left));
+                    continue;
+                }
+
+                int amount = item.getAmount();
+                double unitPrice = prices.getDouble(materialKey);
+
+                GovernmentStockService.submitStock(uuid, job, item.clone(), amount, unitPrice);
+
+                total += unitPrice * amount;
+                inv.setItem(getSlot, null);
+            }
+
+            if (total <= 0) {
+                p.sendMessage("§cTidak ada item yang bisa dijual.");
+                return;
+            }
+
+            EconomyService.add(uuid, total);
+            p.sendMessage("§aBerhasil menjual barang senilai §e$" + total);
+
+            if (hasInvalidItem) {
+                p.sendMessage("§eBeberapa item tidak sesuai pekerjaan dan telah dikembalikan.");
+            }
         }
     }
+
+    public void onChange(Player p, int slot, MenuContext ctx) {
+        UUID uuid = p.getUniqueId();
+        String job = JobsService.getJob(uuid).toLowerCase();
+
+        ConfigurationSection prices =
+                config().getConfigurationSection("jobs." + job + ".prices");
+
+        if (prices == null) return;
+
+        @SuppressWarnings("unchecked")
+        Set<Integer> inputSlots = (Set<Integer>) ctx.get("inputSlots", Set.class);
+
+        Inventory inv = p.getOpenInventory().getTopInventory();
+
+        double total = 0;
+
+        for (int s : inputSlots) {
+            ItemStack item = inv.getItem(s);
+            if (item == null || item.getType() == Material.AIR) continue;
+
+
+            String key = item.getType().name();
+            if (!prices.contains(key)) continue;
+
+            double unitPrice = prices.getDouble(key);
+            total += unitPrice * item.getAmount();
+        }
+
+        inv.setItem(43, sellItem(total));
+    }
+
 
     private static FileConfiguration config() {
         return JavaPlugin.getProvidingPlugin(JobsMenu.class).getConfig();
@@ -188,7 +303,7 @@ public class SellItemMenu implements Menu {
         return item;
     }
 
-    private static ItemStack sellItem() {
+    private static ItemStack sellItem(double total) {
         ItemStack item = new ItemStack(Material.EMERALD);
         ItemMeta meta = item.getItemMeta();
 
@@ -200,6 +315,9 @@ public class SellItemMenu implements Menu {
         meta.lore(List.of(
                 Component.text("Operasi ini tidak bisa dibatalkan")
                         .color(TextColor.color(180, 180, 180))
+                        .decorate(TextDecoration.ITALIC),
+                Component.text("Total Harga: $" + total)
+                        .color(TextColor.color(255, 204, 0))
                         .decorate(TextDecoration.ITALIC)));
 
         item.setItemMeta(meta);
