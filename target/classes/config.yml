@@ -2,91 +2,97 @@ jobs:
   fisherman:
     display-name: "🐟 Nelayan"
     prices:
-      COD: 5.0
-      SALMON: 8.0
-      TROPICAL_FISH: 25.0
-      PUFFERFISH: 50.0
-      NAUTILUS_SHELL: 500.0
+      COD: 4.0
+      SALMON: 6.0
+      TROPICAL_FISH: 20.0
+      PUFFERFISH: 35.0
+      NAUTILUS_SHELL: 350.0
+
   farmer:
     display-name: "🌱 Petani"
     prices:
-      WHEAT: 1.0
-      POTATO: 2.0
-      CARROT: 2.0
-      SUGAR_CANE: 3.0
-      MELON_SLICE: 5.0
-      PUMPKIN: 5.0
-      NETHER_WART: 15.0
+      WHEAT: 0.8
+      POTATO: 1.5
+      CARROT: 1.5
+      SUGAR_CANE: 2.0
+      MELON_SLICE: 1.0
+      PUMPKIN: 4.0
+      NETHER_WART: 12.0
+
   miner:
     display-name: "⛏ Penambang"
     prices:
-      COBBLESTONE: 0.5
-      COAL: 5.0
-      RAW_IRON: 10.0
-      RAW_COPPER: 6.0
-      RAW_GOLD: 20.0
-      REDSTONE: 8.0
-      LAPIS_LAZULI: 10.0
-      DIAMOND: 100.0
-      EMERALD: 150.0
-      ANCIENT_DEBRIS: 1000.0
+      COBBLESTONE: 0.2
+      COAL: 4.0
+      RAW_IRON: 8.0
+      RAW_COPPER: 4.0
+      RAW_GOLD: 18.0
+      REDSTONE: 6.0
+      LAPIS_LAZULI: 7.0
+      DIAMOND: 120.0
+      EMERALD: 140.0
+      ANCIENT_DEBRIS: 1200.0
+
   lumberjack:
     display-name: "🪓 Penebang Kayu"
     prices:
-      OAK_LOG: 2.0
-      SPRUCE_LOG: 2.0
-      BIRCH_LOG: 2.0
-      JUNGLE_LOG: 2.0
-      ACACIA_LOG: 2.0
-      DARK_OAK_LOG: 2.0
-      MANGROVE_LOG: 2.0
-      CHERRY_LOG: 2.0
-      PALE_OAK_LOG: 2.0
+      OAK_LOG: 1.5
+      SPRUCE_LOG: 1.5
+      BIRCH_LOG: 1.5
+      JUNGLE_LOG: 1.5
+      ACACIA_LOG: 1.5
+      DARK_OAK_LOG: 1.5
+      MANGROVE_LOG: 1.5
+      CHERRY_LOG: 1.8
+      PALE_OAK_LOG: 1.8
+
   hunter:
     display-name: "🏹 Pemburu"
     prices:
       ROTTEN_FLESH: 0.1
-      BONE: 5.0
-      STRING: 6.0
-      SPIDER_EYE: 6.0
-      GUNPOWDER: 10.0
-      ENDER_PEARL: 50.0
-      BLAZE_ROD: 80.0
-      WITHER_SKELETON_SKULL: 5000.0
+      BONE: 4.0
+      STRING: 4.0
+      SPIDER_EYE: 4.0
+      GUNPOWDER: 9.0
+      ENDER_PEARL: 45.0
+      BLAZE_ROD: 90.0
+      WITHER_SKELETON_SKULL: 7000.0
+
   smelter:
     display-name: "🔥 Smelter"
     prices:
-      IRON_INGOT: 15.0
-      COPPER_INGOT: 8.0
-      GOLD_INGOT: 30.0
-      NETHERITE_SCRAP: 600.0
-      GLASS: 2.0
-      SMOOTH_STONE: 1.0
+      IRON_INGOT: 14.0
+      COPPER_INGOT: 7.0
+      GOLD_INGOT: 28.0
+      NETHERITE_SCRAP: 650.0
+      GLASS: 1.5
+      SMOOTH_STONE: 0.8
+
   breeder:
     display-name: "🐄 Peternak"
     prices:
-      BEEF: 6.0
-      PORKCHOP: 6.0
-      MUTTON: 6.0
-      CHICKEN: 5.0
-      RABBIT: 8.0
-      MILK_BUCKET: 15.0
-      EGG: 3.0
-      LEATHER: 10.0
-      FEATHER: 4.0
+      BEEF: 5.0
+      PORKCHOP: 5.0
+      MUTTON: 5.0
+      CHICKEN: 4.0
+      RABBIT: 7.0
+      MILK_BUCKET: 12.0
+      EGG: 2.0
+      LEATHER: 9.0
+      FEATHER: 3.0
+
   cook:
     display-name: "🍳 Pemasak"
     prices:
-      BREAD: 5.0
-      BAKED_POTATO: 5.0
-      COOKED_BEEF: 10.0
-      COOKED_PORKCHOP: 10.0
-      COOKED_CHICKEN: 8.0
-      COOKED_MUTTON: 9.0
-      COOKED_RABBIT: 12.0
-      PUMPKIN_PIE: 20.0
-      CAKE: 50.0
+      BREAD: 3.5
+      BAKED_POTATO: 4.0
+      COOKED_BEEF: 9.0
+      COOKED_PORKCHOP: 9.0
+      COOKED_CHICKEN: 7.0
+      COOKED_MUTTON: 8.0
+      COOKED_RABBIT: 11.0
+      PUMPKIN_PIE: 18.0
+      CAKE: 45.0
 
 leave:
-  price: 1000.0
-  cooldown-seconds: 0
+  price: 400.0

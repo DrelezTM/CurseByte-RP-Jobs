@@ -1,5 +1,7 @@
 package org.cursebyte.ui;
 
+import com.cursebyte.plugin.modules.economy.TaxService;
+import com.cursebyte.plugin.modules.economy.transaction.TransactionService;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -162,7 +164,9 @@ public class SellItemMenu implements Menu {
                 return;
             }
 
-            EconomyService.add(uuid, total);
+            Double tax = TaxService.calculateTax(total);
+            EconomyService.add(uuid, total - tax);
+
             p.sendMessage("§aBerhasil menjual barang senilai §e$" + total);
 
             if (hasInvalidItem) {
