@@ -1,7 +1,6 @@
 package org.cursebyte.ui;
 
-import com.cursebyte.plugin.modules.economy.TaxService;
-import com.cursebyte.plugin.modules.economy.transaction.TransactionService;
+import com.cursebyte.plugin.modules.economy.TaxService;import com.cursebyte.plugin.modules.economy.transaction.TransactionService;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -52,7 +51,8 @@ public class SellItemMenu implements Menu {
             inv.setItem(i, blackGlass);
 
         inv.setItem(40, closeItem());
-        inv.setItem(4, sellInfoItem(p.getUniqueId()));
+        inv.setItem(3, sellInfoItem(p.getUniqueId()));
+        inv.setItem(5, checkTotalPrices());
         inv.setItem(37, outOfJobs());
         inv.setItem(43, sellItem(0));
 
@@ -63,7 +63,36 @@ public class SellItemMenu implements Menu {
     @Override
     public void onClick(Player p, int slot, MenuContext ctx) {
         UUID targetId = p.getUniqueId();
-        if (slot == 37) {
+        if (slot == 5) {
+            UUID uuid = p.getUniqueId();
+            String job = JobsService.getJob(uuid).toLowerCase();
+
+            ConfigurationSection prices =
+                    config().getConfigurationSection("jobs." + job + ".prices");
+
+            if (prices == null) return;
+
+            @SuppressWarnings("unchecked")
+            Set<Integer> inputSlots = (Set<Integer>) ctx.get("inputSlots", Set.class);
+
+            Inventory inv = p.getOpenInventory().getTopInventory();
+
+            double total = 0;
+
+            for (int s : inputSlots) {
+                ItemStack item = inv.getItem(s);
+                if (item == null || item.getType() == Material.AIR) continue;
+
+
+                String key = item.getType().name();
+                if (!prices.contains(key)) continue;
+
+                double unitPrice = prices.getDouble(key);
+                total += unitPrice * item.getAmount();
+            }
+
+            p.sendMessage("§eTotal Price: §a$" + total);
+        } else if (slot == 37) {
             @SuppressWarnings("unchecked")
             Set<Integer> inputSlots = (Set<Integer>) ctx.get("inputSlots", Set.class);
             Inventory inv = p.getOpenInventory().getTopInventory();
@@ -175,36 +204,8 @@ public class SellItemMenu implements Menu {
         }
     }
 
-    public void onChange(Player p, int slot, MenuContext ctx) {
-        UUID uuid = p.getUniqueId();
-        String job = JobsService.getJob(uuid).toLowerCase();
-
-        ConfigurationSection prices =
-                config().getConfigurationSection("jobs." + job + ".prices");
-
-        if (prices == null) return;
-
-        @SuppressWarnings("unchecked")
-        Set<Integer> inputSlots = (Set<Integer>) ctx.get("inputSlots", Set.class);
-
-        Inventory inv = p.getOpenInventory().getTopInventory();
-
-        double total = 0;
-
-        for (int s : inputSlots) {
-            ItemStack item = inv.getItem(s);
-            if (item == null || item.getType() == Material.AIR) continue;
-
-
-            String key = item.getType().name();
-            if (!prices.contains(key)) continue;
-
-            double unitPrice = prices.getDouble(key);
-            total += unitPrice * item.getAmount();
-        }
-
-        inv.setItem(43, sellItem(total));
-    }
+    @Override
+    public void onChange(Player p, int slot, MenuContext ctx) {}
 
 
     private static FileConfiguration config() {
@@ -221,6 +222,24 @@ public class SellItemMenu implements Menu {
         }
 
         return builder.toString().trim();
+    }
+
+    private static ItemStack checkTotalPrices() {
+        ItemStack item = new ItemStack(Material.PAPER);
+        ItemMeta meta = item.getItemMeta();
+
+        meta.displayName(
+                Component.text("💲 Total Penjualan")
+                        .color(TextColor.color(255, 204, 0))
+                        .decorate(TextDecoration.BOLD));
+
+        meta.lore(List.of(
+                Component.text("Lihat estimasi harga sebelum menjual")
+                        .color(TextColor.color(180, 180, 180))
+                        .decorate(TextDecoration.ITALIC)));
+
+        item.setItemMeta(meta);
+        return item;
     }
 
     private static ItemStack glass(Material color) {
@@ -319,9 +338,6 @@ public class SellItemMenu implements Menu {
         meta.lore(List.of(
                 Component.text("Operasi ini tidak bisa dibatalkan")
                         .color(TextColor.color(180, 180, 180))
-                        .decorate(TextDecoration.ITALIC),
-                Component.text("Total Harga: $" + total)
-                        .color(TextColor.color(255, 204, 0))
                         .decorate(TextDecoration.ITALIC)));
 
         item.setItemMeta(meta);

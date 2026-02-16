@@ -23,7 +23,6 @@ public final class CursebyteJobs extends JavaPlugin {
         registerListeners();
 
         getLogger().info("Cursebyte Jobs launched!");
-
     }
 
     @Override
